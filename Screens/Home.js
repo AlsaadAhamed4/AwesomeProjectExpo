@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, RefreshControl } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler';
+import { StyleSheet, RefreshControl, FlatList, TouchableOpacity, Text } from 'react-native'
 import PaletteView from '../components/PaletteView';
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
+
+    const newColorPalette = route.params ? route.params.newColorPalette : null;
 
     const [allColors, setAllColors] = useState([]);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -29,6 +30,12 @@ const Home = ({ navigation }) => {
         fetchColors();
     }, []);
 
+    useEffect(() => {
+        if (newColorPalette) {
+            setAllColors(current => [newColorPalette, ...current]);
+        }
+    }, [newColorPalette]);
+
 
     return (
         <FlatList
@@ -39,6 +46,11 @@ const Home = ({ navigation }) => {
                 <PaletteView handlePress={() => navigation.push('ColorPalette', item)} colorPalette={item} />
             )}
             refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefreshing} />}
+            ListHeaderComponent={
+                <TouchableOpacity style={{ padding: 10 }} onPress={() => { navigation.push('AddColorPaletteModal') }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", color: "teal" }}>+ Color Scheme</Text>
+                </TouchableOpacity>
+            }
         />
     );
 }
